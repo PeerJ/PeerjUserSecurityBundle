@@ -60,11 +60,26 @@ class RedisSessionManager implements SessionManagerInterface
                 if ($count > 0) {
 		  $items = array_fill(0, $count, null);
                 } else {
-                  $items = array();
+                  $items = [];
                 }
 
            return $items; 
 	}
+
+    public function findAllByUsernameAndLoginAttemptDate($type, $username, $timeLimit)
+    {
+        $keyUsername = sprintf("PeerJUserSecurityBundle::%s::username::%s", $type, $username);
+        $now = new \DateTime();
+
+        $count = $this->redis->zcount($keyUsername, $timeLimit->getTimestamp(), $now->getTimestamp());
+        if ($count > 0) {
+            $items = array_fill(0, $count, null);
+        } else {
+            $items = [];
+        }
+
+        return $items;
+    }
 	
     /**
      *
@@ -84,6 +99,9 @@ class RedisSessionManager implements SessionManagerInterface
         
         $this->redis->zadd($keyIp, $now->getTimestamp(), serialize(array($username, $now->getTimestamp())));
         $this->redis->expireat($keyIp, $timeLimit->getTimestamp());
+
+        $this->redis->zadd($keyUsername, $now->getTimestamp(), serialize(array($ipAddress, $now->getTimestamp())));
+        $this->redis->expireat($keyUsername, $timeLimit->getTimestamp());
 
         return $this;
     }

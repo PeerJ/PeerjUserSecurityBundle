@@ -161,10 +161,16 @@ class LoginShieldListener
             // Set a limit on how far back we want to look at failed login attempts.
             $timeLimit = new \DateTime('-' . $this->blockForMinutes . ' minutes');
 
+            if ($request->request->has('_username')) {
+                $username = $request->request->get('_username');
+            } else {
+                $username = null;
+            }
+
             $ipAddress = $request->getClientIp();
 
             // Get number of failed login attempts.
-            $attempts = $this->loginFailureTracker->getAttempts($ipAddress);
+            $attempts = $this->loginFailureTracker->getAttempts($ipAddress, $username);
 
             if (count($attempts) > ($this->limitAttempts -1)) {
                 $this->logger->warning(sprintf("Blocked access to %s from %s", $route, $ipAddress));
