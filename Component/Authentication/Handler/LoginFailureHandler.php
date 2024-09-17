@@ -70,7 +70,7 @@ class LoginFailureHandler extends DefaultAuthenticationFailureHandler implements
 	 * @var array $loginRouteParams
      */
     protected $loginRouteParams;
-	
+
     /**
      * Constructor.
      *
@@ -81,8 +81,14 @@ class LoginFailureHandler extends DefaultAuthenticationFailureHandler implements
 	 * @param \Peerj\UserSecurityBundle\Component\Authentication\Tracker\LoginFailureTracker $loginFailureTracker
 	 * @param bool $enabled
      */
-    public function __construct(HttpKernelInterface $httpKernel, HttpUtils $httpUtils, array $options, LoggerInterface $logger = null, LoginFailureTracker $loginFailureTracker = null, $enabled = false)
-    {
+    public function __construct(
+        HttpKernelInterface $httpKernel,
+        HttpUtils $httpUtils,
+        array $options,
+        LoggerInterface $logger = null,
+        LoginFailureTracker $loginFailureTracker = null,
+        $enabled = false
+    ){
 		$this->loginFailureTracker = $loginFailureTracker;
 		$this->enabled = $enabled;
 		
@@ -105,10 +111,9 @@ class LoginFailureHandler extends DefaultAuthenticationFailureHandler implements
 			} else {
 				$username = '';
 			}
-			
+
             // Get our visitors IP address.
             $ipAddress = $request->getClientIp();
-
             // Make a note of the failed login.
             $this->loginFailureTracker->addAttempt($ipAddress, $username);
         }

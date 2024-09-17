@@ -56,11 +56,22 @@ class LoginFailureTracker
 	 * @param string $ipAddress
      * @return array
      */
-    public function getAttempts($ipAddress)
+    public function getAttempts($ipAddress, $username = null)
     {
         // Set a limit on how far back we want to look at failed login attempts.
         $timeLimit = new \DateTime('-' . $this->blockForMinutes . ' minutes');
-		return $this->sessionManager->findAllByIpAddressAndLoginAttemptDate($this->getType(), $ipAddress, $timeLimit);
+
+        $items = array();
+
+        if ($ipAddress) {
+            $items = $this->sessionManager->findAllByIpAddressAndLoginAttemptDate($this->getType(), $ipAddress, $timeLimit);
+        }
+
+        if (!$items && $username) {
+            $items = $this->sessionManager->findAllByUsernameAndLoginAttemptDate($this->getType(), $username, $timeLimit);
+        }
+
+		return $items;
     }
 
     /**
